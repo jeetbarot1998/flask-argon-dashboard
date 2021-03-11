@@ -1,0 +1,89 @@
+
+<div class="main-content">
+  <div class="col-xl-8 order-xl-1">
+    <div class="card bg-secondary shadow">
+      <div class="card-header bg-white border-0">
+        <div class="row align-items-center">
+        </div>
+      </div>
+      {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+      <form role="form" method="post" action="">
+
+        <div class="pl-lg-4">
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group">
+              </div>
+              {{ form.productname(placeholder="Product name",class="form-control") }}
+              <br>
+              {{ form.specification(placeholder="Specification",class="form-control") }}
+              <br>
+              {{ form.category(placeholder="Category",class="form-control") }}
+              <br>
+              {{ form.price(placeholder="Price",class="form-control") }}
+
+            </div>
+          </div>
+        </div>
+
+        
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </div>
+        <div class="text-center">
+          <p>
+
+          </p>
+        </div>
+
+
+      </form>
+    
+
+      <table>
+        <tr>
+          <th> Products</th>
+          <th> Actions</th>
+        </tr>
+        {% for task in tasks %}
+        <div>
+          <tr>
+            <td>
+              <div class="row">
+                <div class="col-xl-3 col-xl-6">
+                  <div class="card card-stats mb-4 mb-xl-0">
+
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col">
+                          <h5 class="mt-3 mb-0 text-muted text-sm">Name:{{ task.productname }}</h5>
+
+                          <span class="mt-3 mb-0 text-muted text-sm">Specs: {{ task.specification }}</span>
+                          <br>
+                          <span class="mt-3 mb-0 text-muted text-sm"></span>Category: {{ task.category }}</span>
+                          <br>
+                          <span class="text-nowrap">${{ task.price }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="/delete/{{task.id}}">Delete</a>
+            </td>
+          </tr>
+        </div>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
