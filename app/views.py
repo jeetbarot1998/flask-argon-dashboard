@@ -8,14 +8,18 @@ Copyright (c) 2019 - present AppSeed.us
 import os, logging 
 
 # Flask modules
-from flask               import render_template, request, url_for, redirect, send_from_directory
+from flask               import render_template, request, url_for, redirect, send_from_directory,flash
 from flask_login         import login_user, logout_user, current_user, login_required
 from werkzeug.exceptions import HTTPException, NotFound, abort
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
 
 # App modules
 from app        import app, lm, db, bc
-from app.models import User
-from app.forms  import LoginForm, RegisterForm
+from app.models import User,productin
+from app.forms  import LoginForm, RegisterForm, AddProduct
+
 
 # provide login manager with load_user callback
 @lm.user_loader
@@ -59,7 +63,7 @@ def register():
         if user or user_by_email:
             msg = 'Error: User exists!'
         
-        else:         
+        else:      
 
             pw_hash = password #bc.generate_password_hash(password)
 
@@ -74,6 +78,7 @@ def register():
 
     return render_template('layouts/auth-default.html',
                             content=render_template( 'pages/register.html', form=form, msg=msg ) )
+      
 
 # Authenticate user
 @app.route('/login.html', methods=['GET', 'POST'])
@@ -133,3 +138,41 @@ def index(path):
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'sitemap.xml')
+
+# Add products
+@app.route('/product.html', methods=['GET', 'POST'])
+def product():
+    form= AddProduct(request.form)
+    msg = None
+                            
+    if request.method == 'POST':
+        msg="Done"
+        prodn = request.form.get('productname', '', type=str)
+        specs = request.form.get('specification','',  type=str) 
+        cat = request.form.get('category','',  type=str)
+        prc = request.form.get('price','', type=str)
+        add_product = productin(productname =prodn ,specification=specs ,category= cat, price= prc)
+        db.session.add(add_product)
+        db.session.commit()
+        flash('You have successfully added product')
+        return redirect('/product.html')
+        
+    if request.method == 'GET': 
+        form2= productin.query.all()
+        return render_template('layouts/default.html',
+                            content=render_template( 'pages/product.html', tasks=form2,form=form))
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    task_to_delete = productin.query.get_or_404(id)
+
+    try:
+        db.session.delete(task_to_delete)
+        db.session.commit()
+        return redirect('/product.html')
+    except:
+        return 'There was a problem deleting that task'
+    
+
+
+
